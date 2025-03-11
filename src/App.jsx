@@ -20,5 +20,6 @@ const App = () => {
 };
 
 // test comment 1
+// Adde comment 2
 
 export default App;
