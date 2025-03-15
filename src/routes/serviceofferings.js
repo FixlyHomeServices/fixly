@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const ServiceOffering = require("../models/serviceOffering");
+const ServiceOffering = require("../models/serviceoffering");
 const { verifyToken } = require("../middlewares/authMiddleware"); // Ensure only logged-in users can access
 
 // Add a new service offering
