@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 // Signup Route
 router.post("/signup", async (req, res) => {
   try {
-    const { fullName, email, mobile, roles } = req.body;
+    const {username, fullName, email, mobile, roles } = req.body;
     
     // Validate request
     if (!fullName || (!email && !mobile) || !roles) {
@@ -33,7 +33,7 @@ router.post("/signup", async (req, res) => {
     let user = await User.findOne({ $or: [{ email }, { mobile }] });
 
     if (!user) {
-      user = new User({ fullName, email, mobile, roles });
+      user = new User({username, fullName, email, mobile, roles });
     }
 
     // Generate OTP
@@ -43,6 +43,14 @@ router.post("/signup", async (req, res) => {
     await user.save();
 
     // Send OTP via Email
+    // if (email) {
+    //   await transporter.sendMail({
+    //     from: process.env.EMAIL_USER,
+    //     to: email,
+    //     subject: "Your Fixly OTP",
+    //     text: `Your OTP is ${otp}`,
+    //   });
+    // }
     // if (email) {
     //   await transporter.sendMail({
     //     from: process.env.EMAIL_USER,
@@ -110,7 +118,7 @@ router.get(
         { expiresIn: "7d" }
       );
 
-      res.redirect(`http://localhost:5000?token=${token}`); // Redirect to frontend with token
+      res.redirect(`http://localhost:5002?token=${token}`); // Redirect to frontend with token
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Google authentication failed" });
