@@ -1,27 +1,26 @@
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LogIn from './Components/LogIn';
 import Home from './Components/Home';
-import Register from './Components/Register';
 import Services from './Components/Services';
-import MoreDetails from './Components/MoreDetails'; // Import MoreDetails
+import MoreDetails from './Components/MoreDetails';
+import Register from './Components/Register';
+import { SignUp, UserProfile } from '@clerk/clerk-react';
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/services" element={<Home showServices />} />
-      <Route path="/moredetails/:serviceId" element={<MoreDetails />} /> {/* Fixed route */}
-      <Route path="/login" element={<LogIn />} />
-      <Route path="/login/register" element={<Register />} />
-      <Route path="/*" element={<h1>404 Error</h1>} />
-    </Routes>
+      <div>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/profile' element={<UserProfile />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/moredetails/:serviceId" element={<MoreDetails />} /> 
+          <Route path='/login' element={<LogIn />} />
+          <Route path='/login/register' element={<Register />} />
+          <Route path='/*' element={<h1>404 Error</h1>} />
+        </Routes>
+      </div>
   );
 };
-
-// test comment 9999
-
-// test comment 1
-// Adde comment 2
 
 export default App;
