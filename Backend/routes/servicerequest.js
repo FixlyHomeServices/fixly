@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const ServiceRequest = require("../models/servicerequest");
-const { verifyToken } = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middlewares/authmiddleware");
 
 //  Create a new service request
 router.post("/request", verifyToken, async (req, res) => {
