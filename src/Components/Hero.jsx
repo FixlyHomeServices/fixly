@@ -1,5 +1,5 @@
 import React from 'react';
-import pic from '../assets/div.jpg';
+import pic from '../assets/logo.png';
 
 const Hero = () => {
   const cards = [
