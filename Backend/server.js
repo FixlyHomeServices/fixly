@@ -6,7 +6,7 @@ const session = require("express-session");
 const axios = require("axios");
 const fs = require("fs");
 const connectDB = require("./src/config/db");
-//const passport = require("./src/middlewares/googleauth");
+const passport = require("./src/middlewares/googleauth");
 
 const authRoutes = require("./src/routes/auth");
 const apiRoutes = require("./src/routes/apiroutes");
@@ -31,8 +31,9 @@ app.use(
     saveUninitialized: true,
   })
 );
-//app.use(passport.initialize());
-//app.use(passport.session());
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.use("/api", apiRoutes);
