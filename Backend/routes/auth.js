@@ -4,6 +4,7 @@ const User = require("../models/users");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
+
 require("dotenv").config();
 
 // OTP Generator
@@ -42,6 +43,14 @@ router.post("/signup", async (req, res) => {
     await user.save();
 
     // Send OTP via Email
+    // if (email) {
+    //   await transporter.sendMail({
+    //     from: process.env.EMAIL_USER,
+    //     to: email,
+    //     subject: "Your Fixly OTP",
+    //     text: `Your OTP is ${otp}`,
+    //   });
+    // }
     // if (email) {
     //   await transporter.sendMail({
     //     from: process.env.EMAIL_USER,
