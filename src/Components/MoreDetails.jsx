@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Header from "./Header";  // Importing Header
+import UserHeader from "./Userheader";  // Importing Header
 import Footer from "./Footer";  // Importing Footer
 
 const MoreDetails = () => {
@@ -15,7 +15,7 @@ const MoreDetails = () => {
 
   return (
     <>
-      <Header /> {/* Display header */}
+      <UserHeader /> {/* Display header */}
       <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 flex flex-col md:flex-row">
         {/* Left Section: Image */}
         <div className="md:w-1/2 flex justify-center">
