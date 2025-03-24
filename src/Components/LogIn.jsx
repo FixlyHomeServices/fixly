@@ -1,27 +1,99 @@
-import logo from '../assets/logo.png';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 export default function LogIn() {
-  return (
-    <>
-      <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-900">
-        <div className="sm:mx-auto sm:w-screen sm:max-w-sm">
-          <img
-            alt="Your Company"
-            src={logo}
-            className="mx-auto h-10 w-auto"
-          />
-          <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-            Sign in to your account
-          </h2>
-        </div>
+  const location = useLocation();
+  const navigate = useNavigate();
+  console.log(location.state);
+  
+  const [formData, setFormData] = useState({ email: "", otp: "" });
+  const [otpSent, setOtpSent] = useState(false);
+  const [cameFromSignup, setCameFromSignup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-        <div className="mt-10 sm:mx-auto sm:w-screen sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
+  useEffect(() => {
+    if (location.state?.fromSignup && location.state?.email) {
+      setCameFromSignup(true);
+      setOtpSent(true);
+      setFormData((prev) => ({ ...prev, email: location.state.email }));
+    }
+  }, [location]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSendOtp = async () => {
+    if (!formData.email) {
+      alert("Please enter your Email or Mobile Number.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:3001/auth/request-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("OTP sent successfully!");
+        setOtpSent(true);
+      } else {
+        alert(data.message || "Failed to send OTP.");
+      }
+    } catch (error) {
+      console.error("OTP sending error:", error);
+      alert("Something went wrong! Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpSent) {
+      alert("Please request an OTP first.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("Login successful!");
+        navigate("/profile"); // Redirect user after successful login
+      } else {
+        alert(data.message || "Invalid OTP.");
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      alert("Something went wrong! Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 bg-gray-900">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <img src={logo} alt="Logo" className="mx-auto h-10 w-auto" />
+        <h2 className="mt-10 text-center text-2xl font-bold text-white">
+          Sign in to your account
+        </h2>
+      </div>
+
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="email" className="block text-sm/6 font-medium text-white">
-                  Email address
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                  Email or Mobile Number
                 </label>
               </div>
               <div className="mt-2">
@@ -30,56 +102,63 @@ export default function LogIn() {
                   name="email"
                   type="email"
                   required
-                  autoComplete="email"
-                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-700 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  disabled={cameFromSignup}
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
             </div>
 
-            <div>
+
+          {!otpSent ? (
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              className="w-full rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500"
+              disabled={loading}
+            >
+              {loading ? "Sending..." : "Send OTP"}
+            </button>
+          ) : (
+            <>
+              <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm/6 font-medium text-white">
-                  Password
+                <label htmlFor="otp" className="block text-sm font-medium text-gray-300">
+                  Enter OTP
                 </label>
-                <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-400 hover:text-indigo-300">
-                    Forgot password?
-                  </a>
-                </div>
               </div>
               <div className="mt-2">
                 <input
-                  id="password"
-                  name="password"
-                  type="password"
+                  id="otp"
+                  name="otp"
+                  type="text"
                   required
-                  autoComplete="current-password"
-                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-700 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
             </div>
-
-            <div>
+              
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500"
+                disabled={loading}
               >
-                Sign in
+                {loading ? "Signing in..." : "Sign in"}
               </button>
-            </div>
-          </form>
+            </>
+          )}
+        </form>
 
-          <p className="mt-10 text-center text-sm/6 text-gray-400">
-            Not a member?{' '}
-            <Link
-              to="/login/register"
-              className="font-semibold text-indigo-400 hover:text-indigo-300"
-            >
-              Register here
-            </Link>
-          </p>
-        </div>
+        <p className="mt-10 text-center text-sm text-gray-400">
+          Not a member?{' '}
+          <Link to="/login/register" className="font-semibold text-indigo-400 hover:text-indigo-300">
+            Register here
+          </Link>
+        </p>
       </div>
-    </>
-  )
+    </div>
+  );
 }
