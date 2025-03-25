@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import {useContext, useState } from 'react';
+
 import {
   Dialog,
   DialogPanel,
@@ -11,7 +12,7 @@ import {
   PopoverButton,
   PopoverGroup,
   PopoverPanel,
-} from '@headlessui/react'
+} from '@headlessui/react';
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -20,9 +21,11 @@ import {
   FingerPrintIcon,
   SquaresPlusIcon,
   XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+} from '@heroicons/react/24/outline';
+import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid';
 import { Link } from 'react-router-dom';
+import { FaUserCircle } from 'react-icons/fa';
+import { UserDataContext } from '../context/usercontext';
 import logo from '../assets/logo.png';
 
 const products = [
@@ -31,14 +34,16 @@ const products = [
   { name: 'Electrician', description: ' Installs, repairs, and maintains electrical wiring, switches, outlets, and fixtures', href: '#', icon: FingerPrintIcon },
   { name: 'Window cleaner', description: 'Clean windows thoroughly and safely in all locations', href: '#', icon: SquaresPlusIcon },
   { name: 'Gardener', description: 'planting new plants and trimming existing ones', href: '#', icon: ArrowPathIcon },
-]
+];
 const callsToAction = [
   { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
   { name: 'Contact sales', href: '#', icon: PhoneIcon },
-]
+];
 
-export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export default function UserHeader() {
+  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useContext(UserDataContext);
 
   return (
     <header className="bg-gray-900 w-full overflow:hidden">
@@ -112,20 +117,30 @@ export default function Header() {
             </PopoverPanel>
           </Popover>
 
-          <a href="#" className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
-            Home
-          </a>
+          <Link 
+             to="/home" 
+             className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+            >
+             Home
+            </Link>
           <a href="#" className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
             About
           </a>
           <a href="#" className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
-            Add Sevices
+            Add Services
           </a>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <Link to="/login" className="text-sm font-semibold text-gray-300 hover:bg-green-600 transition duration-300 ease-in-out">
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {user && user.fullName ? (
+            <Link to="/profileUI" className="flex items-center text-white">
+              <FaUserCircle className="text-2xl mr-2" />
+              <span>{user.fullName}</span>
+            </Link>
+          ) : (
+            <Link to="/login" className="text-sm font-semibold text-gray-300 hover:bg-green-600 transition duration-300 ease-in-out">
+              Log in <span aria-hidden="true">&rarr;</span>
+            </Link>
+          )}
         </div>
       </nav>
       <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
@@ -190,12 +205,21 @@ export default function Header() {
                 </a>
               </div>
               <div className="py-6">
-                <Link
-                  to="/login"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-300 hover:bg-gray-700"
-                >
-                  Log in
-                </Link>
+                {user && user.fullName ? (
+                  <div className="flex items-center text-white">
+                  <Link to="/profileUI">
+                    <FaUserCircle className="text-2xl mr-2 cursor-pointer" />
+                  </Link>
+                  <span>{user.fullName}</span>
+                </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-300 hover:bg-gray-700"
+                  >
+                    Log in
+                  </Link>
+                )}
               </div>
             </div>
           </div>

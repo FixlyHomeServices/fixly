@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const session = require("express-session");
+
 const axios = require("axios");
 const fs = require("fs");
 const connectDB = require('./config/db');
@@ -15,7 +15,8 @@ const serviceRequestRoutes = require("./routes/servicerequest");
 const chatbotRoutes = require("./chatbot"); // ✅ chatbot.js in same folder
 
 const app = express();
-const PORT = 5000;
+const PORT = 3001;
+
 
 // Middleware
 app.use(cors());
@@ -25,23 +26,28 @@ app.use(bodyParser.json());
 // Database connection
 connectDB();
 
-// Session for Google OAuth
-app.use(
-  session({
-    secret: process.env.JWT_SECRET || "default_secret",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Routes
 app.use("/api", apiRoutes);
 app.use("/auth", authRoutes);
 app.use("/servicerequest", serviceRequestRoutes);
 app.use("/backend", chatbotRoutes); // ✅ chatbot endpoint
+
+
+// Test routes
+app.get("/", (req, res) => {
+  res.send("Fixly Node.js server is running!");
+});
+
+app.get("/test", (req, res) => {
+  res.send("API is working!");
+
+});
+
+app.get("/test", (req, res) => {
+  res.send("API is working!");
+});
+
+// ---------------------- BACKEND (merged) ---------------------- //
 
 // Load shops data from file
 const path = require("path");
@@ -118,5 +124,5 @@ app.get("/test", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
