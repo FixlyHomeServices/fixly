@@ -68,6 +68,14 @@
       "location": "Mumbai",
       "rating": 4.2,
       "priceRange": "$$$$"
+    },
+    {
+      "name": "Kanpur Plumbing Solutions",
+      "category": "Plumber",
+      "location": "Kanpur",
+      "rating": 4.6,
+      "priceRange": "$$"
     }
+    
   ]
   
