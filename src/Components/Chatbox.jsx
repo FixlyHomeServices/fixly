@@ -1,85 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [hasGreeted, setHasGreeted] = useState(false);
+const Chatbot = () => {
+  const [messages, setMessages] = useState([
+    { text: "Hello! How can I help you?", sender: "bot" },
+  ]);
   const [options, setOptions] = useState([
     "Select a service",
     "Ask about refund policy",
     "How to book a service?",
     "Contact support",
+    "Ask about previous orders",
   ]);
   const [input, setInput] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
-
-    if (!hasGreeted) {
-      setMessages([
-        { sender: "bot", text: "Hi! Welcome to Fixly. 😊 How can I help you today?" }
-      ]);
-      setHasGreeted(true);
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUserEmail(parsedUser.email);
     }
-  };
+  }, []);
 
   const sendMessage = async (message) => {
-    if (!message.trim()) return; // Prevent empty messages
+    if (!message.trim()) return;
 
-    setMessages((prev) => [...prev, { sender: "user", text: message }]);
-    setInput(""); // Clear input field
+    setMessages((prev) => [...prev, { text: message, sender: "user" }]);
 
-    const response = await fetch("http://localhost:3001/backend/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    });
 
-    const data = await response.json();
-    setMessages((prev) => [...prev, { sender: "bot", text: data.response }]);
+    try {
+      const response = await axios.post("http://localhost:3001/backend/chat", { 
+        message,
+        email: userEmail,
+      });
 
-    if (data.options.length > 0) {
-      setOptions(data.options);
-    } else {
-      setOptions([]);
+
+      setMessages((prev) => [
+        ...prev,
+        { text: response.data.response, sender: "bot" },
+      ]);
+      setOptions(response.data.options || []);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setMessages((prev) => [
+        ...prev,
+        { text: "Error connecting to chatbot.", sender: "bot" },
+      ]);
     }
+
+    setInput("");
   };
 
-  // Handle Enter key press
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      sendMessage(input);
-    }
+  const handleOptionClick = (option) => {
+    sendMessage(option);
   };
 
   return (
-    <div>
-      {/* Chatbot Button */}
-      <button
-        onClick={toggleChat}
-        className="fixed bottom-5 right-5 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-all"
+    <div className="fixed bottom-4 right-4 z-50">
+      <div
+        className="text-4xl bg-indigo-600 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg cursor-pointer hover:bg-indigo-700 transition-all"
+        onClick={() => setShowChat(!showChat)}
       >
-        💬 Chat
-      </button>
+        💬
+      </div>
 
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed bottom-16 right-5 w-80 bg-white border border-gray-300 shadow-xl rounded-lg">
-          {/* Header */}
-          <div className="bg-blue-600 text-white p-3 rounded-t-lg flex justify-between">
-            <span>Fixly Chat</span>
-            <button onClick={toggleChat} className="text-lg">✖</button>
+      {showChat && (
+        <div className="fixed bottom-24 right-4 w-80 bg-white rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden">
+          <div className="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Fixly Chatbot</h3>
+            <button
+              className="text-xl font-bold"
+              onClick={() => setShowChat(false)}
+            >
+              ✖
+            </button>
           </div>
 
-          {/* Messages */}
-          <div className="p-3 h-64 overflow-y-auto flex flex-col space-y-2">
+          <div className="p-4 flex-grow overflow-y-auto max-h-96 space-y-2">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`p-2 rounded-lg text-sm ${
-                  msg.sender === "user"
-                    ? "bg-blue-500 text-white self-end"
-                    : "bg-gray-200 text-gray-900 self-start"
+                className={`p-2 rounded-lg w-fit max-w-[70%] ${
+                  msg.sender === "bot"
+                    ? "bg-gray-200 text-gray-800 self-start"
+                    : "bg-indigo-500 text-white self-end ml-auto"
                 }`}
               >
                 {msg.text}
@@ -87,39 +93,38 @@ export default function Chatbot() {
             ))}
           </div>
 
-          {/* Options */}
-          <div className="p-3 border-t">
-            {options.length > 0 &&
-              options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => sendMessage(option)}
-                  className="block w-full text-left p-2 mb-1 bg-gray-100 hover:bg-gray-200 rounded-md text-sm"
-                >
-                  {option}
-                </button>
-              ))}
+          <div className="p-3 grid grid-cols-2 gap-2 border-t">
+            {options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleOptionClick(option)}
+                className="text-sm bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 transition"
+              >
+                {option}
+              </button>
+            ))}
           </div>
 
-          {/* Input Field */}
-          <div className="p-3 border-t flex">
+          <div className="flex border-t p-2">
             <input
               type="text"
-              placeholder="Type a message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown} // Listen for Enter key
-              className="flex-1 px-2 py-1 border rounded-md focus:outline-none"
+              placeholder="Type a message..."
+              onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
+              className="flex-grow border rounded-l-md px-3 py-2 focus:outline-none"
             />
             <button
               onClick={() => sendMessage(input)}
-              className="ml-2 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+              className="bg-indigo-600 text-white px-4 rounded-r-md hover:bg-indigo-700 transition"
             >
-              ➤
+              Send
             </button>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default Chatbot;

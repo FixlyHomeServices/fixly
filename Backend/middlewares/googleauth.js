@@ -32,9 +32,6 @@ passport.use(
   )
 );
 
-
-
-// Serialize & Deserialize User (required for session support)
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
