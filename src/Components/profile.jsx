@@ -3,7 +3,6 @@ import { UserDataContext } from "../context/usercontext";
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
-import UserHeader from "./Userheader";
 
 export default function Profile() {
   const { user } = useContext(UserDataContext);
@@ -19,6 +18,7 @@ export default function Profile() {
             
             <li className="flex text-left space-x-3 p-3 rounded-lg bg-white text-gray-900 hover:bg-gray-200">
             <Link to="/home" className="w-full h-full">
+                <span className = "text-2xl">🏠︎  </span> 
                 <span>Home</span>
             </Link>
             </li>
@@ -29,6 +29,10 @@ export default function Profile() {
             <li className="flex items-center space-x-3 p-3 rounded-lg bg-white text-gray-900 hover:bg-gray-200">
               <span>💼</span>
               <span>Add Services</span>
+            </li>
+            <li className="flex items-center space-x-3 p-3 rounded-lg bg-white text-gray-900 hover:bg-gray-200">
+              <span>☷</span>
+              <span>DashBoard</span>
             </li>
             <li className="flex items-center space-x-3 p-3 rounded-lg bg-white text-gray-900 hover:bg-gray-200">
             <Link to="/logout" className="w-full h-full">
