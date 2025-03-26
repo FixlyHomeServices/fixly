@@ -29,7 +29,7 @@ export default function Chatbot() {
     setMessages((prev) => [...prev, { sender: "user", text: message }]);
     setInput(""); // Clear input field
 
-    const response = await fetch("http://localhost:5001/chat", {
+    const response = await fetch("http://localhost:3001/backend/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
