@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const fs = require("fs");
 const connectDB = require('./config/db');
-const passport = require("./middlewares/googleauth");
 
 // Route imports
 const authRoutes = require("./routes/auth");
