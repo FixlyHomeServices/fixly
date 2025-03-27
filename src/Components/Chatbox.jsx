@@ -29,11 +29,13 @@ const Chatbot = () => {
 
     setMessages((prev) => [...prev, { text: message, sender: "user" }]);
 
+
     try {
-      const response = await axios.post("http://localhost:5000/backend/chat", { 
+      const response = await axios.post("http://localhost:3001/backend/chat", { 
         message,
         email: userEmail,
       });
+
 
       setMessages((prev) => [
         ...prev,
