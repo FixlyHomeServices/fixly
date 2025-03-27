@@ -5,13 +5,10 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const axios = require("axios");
 const connectDB = require("./config/db");
-const passport = require("./middlewares/googleauth");
-//const passport = require('passport');
-const { getRecommendations } = require("./recommendation.js");
-
-
+//const passport = require("./middlewares/googleauth");
 
 const path = require("path");
+const fs = require("fs");
 
 // Route imports
 const authRoutes = require("./routes/auth");
@@ -42,8 +39,8 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.initialize());
+//app.use(passport.session());
 
 // Routes
 app.use("/api", apiRoutes);
