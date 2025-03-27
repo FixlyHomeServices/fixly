@@ -1,0 +1,47 @@
+[
+    {
+      "order_id": "101",
+      "user_id": "001",
+      "service_name": "AC Servicing",
+      "service_provider": "CoolAir Experts",
+      "category": "Home Services",
+      "order_date": "2023-09-01",
+      "price": 1000,
+      "discount_used": true,
+      "rating_given": 5
+    },
+    {
+      "order_id": "102",
+      "user_id": "001",
+      "service_name": "Pest Control",
+      "service_provider": "PestGo Solutions",
+      "category": "Home Services",
+      "order_date": "2023-10-15",
+      "price": 1200,
+      "discount_used": false,
+      "rating_given": 4
+    },
+    {
+      "order_id": "103",
+      "user_id": "001",
+      "service_name": "Car Wash",
+      "service_provider": "ShineAuto",
+      "category": "Car Care",
+      "order_date": "2023-11-05",
+      "price": 500,
+      "discount_used": true,
+      "rating_given": 3
+    },
+    {
+      "order_id": "104",
+      "user_id": "001",
+      "service_name": "Sofa Cleaning",
+      "service_provider": "HomeBright Cleaners",
+      "category": "Home Cleaning",
+      "order_date": "2023-11-20",
+      "price": 800,
+      "discount_used": true,
+      "rating_given": 5
+    }
+  ]
+  
