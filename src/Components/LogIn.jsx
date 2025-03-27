@@ -5,7 +5,6 @@ import logo from "../assets/logo.png";
 export default function LogIn() {
   const location = useLocation();
   const navigate = useNavigate();
-  console.log(location.state);
   
   const [formData, setFormData] = useState({ email: "", otp: "" });
   const [otpSent, setOtpSent] = useState(false);
@@ -66,6 +65,7 @@ export default function LogIn() {
       });
       const data = await response.json();
       if (response.ok) {
+        localStorage.setItem("token", data.token);
         alert("Login successful!");
         navigate("/profile"); // Redirect user after successful login
       } else {

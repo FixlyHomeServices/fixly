@@ -4,7 +4,7 @@ import Footer from './Footer';
 import Hero from './Hero';
 import FAQAccordion from './FAQs';
 import UserHeader from './Userheader';
-import Chatbot from './chatbot'; // ✅ Import Chatbot
+import Chatbot from './Chatbox'; // ✅ Import Chatbot
 
 const Home = () => {
   return (

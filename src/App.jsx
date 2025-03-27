@@ -5,7 +5,7 @@ import Home from './Components/Home';
 import Services from './Components/Services';
 import MoreDetails from './Components/MoreDetails';
 import Register from './Components/Register';
-import UserProtectWrapper from './Components/userprotectedwrapper';
+import UserProtectWrapper from './Components/UserProtectWrapper';
 import Profile from './Components/profile';
 import Logout from './Components/Logout';
 

@@ -11,7 +11,7 @@ export default function HeaderSection() {
   const handleSearch = async () => {
     const fullQuery = `${searchQuery} in ${location}`;
     try {
-      const response = await fetch('http://localhost:5000/backend/filter', { 
+      const response = await fetch('http://localhost:3001/backend/filter', { 
       
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
