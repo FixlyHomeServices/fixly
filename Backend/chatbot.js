@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const ServiceRequest = require("./models/servicerequest");
+const ServiceRequest = require("./models/request");
 
 const knowledgeBase = {
   "select a service":

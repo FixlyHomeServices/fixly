@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/users");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { verifyToken, logout } = require("../middlewares/authmiddleware");
 
 require("dotenv").config();
 
@@ -18,21 +19,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ message: "Access denied. No token provided." });
-  }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(400).json({ message: "Invalid token." });
-  }
-};
 
 // Signup Route
 router.post("/signup", async (req, res) => {
@@ -159,5 +146,7 @@ router.get("/profile",verifyToken, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+router.post("/logout", verifyToken, logout);
 
 module.exports = router;

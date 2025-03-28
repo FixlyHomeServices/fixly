@@ -10,7 +10,9 @@ const connectDB = require('./config/db');
 // Route imports
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/apiroutes");
-const serviceRequestRoutes = require("./routes/servicerequest");
+const serviceRequestRoutes = require("./routes/request");
+const addServicesRoutes = require("./routes/services"); // Updated from 'serviceofferings'
+const dashboardRoutes = require("./routes/dashboard");
 const chatbotRoutes = require("./chatbot"); // ✅ chatbot.js in same folder
 
 const app = express();
@@ -28,7 +30,9 @@ connectDB();
 // Routes
 app.use("/api", apiRoutes);
 app.use("/auth", authRoutes);
-app.use("/servicerequest", serviceRequestRoutes);
+app.use("/request", serviceRequestRoutes);
+app.use("/services", addServicesRoutes); // Updated route path
+app.use("/dashboard", dashboardRoutes);
 app.use("/backend", chatbotRoutes); // ✅ chatbot endpoint
 
 
@@ -40,10 +44,6 @@ app.get("/", (req, res) => {
 app.get("/test", (req, res) => {
   res.send("API is working!");
 
-});
-
-app.get("/test", (req, res) => {
-  res.send("API is working!");
 });
 
 // ---------------------- BACKEND (merged) ---------------------- //

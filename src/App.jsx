@@ -25,11 +25,11 @@ const App = () => {
           <Route path='/login' element={<LogIn />} />
           <Route path='/login/register' element={<Register />} />
           <Route path='/home'
-          element={ <Home /> } />
-          {/* <Route path='/logout' element={
-          <UserProtectedWrapper>
+          element={<UserProtectWrapper><Home /></UserProtectWrapper>  } />
+          <Route path='/logout' element={
+          <UserProtectWrapper>
             <Logout />
-          </UserProtectedWrapper>}></Route> */}
+          </UserProtectWrapper>}></Route>
           <Route path='/*' element={<h1>404 Error</h1>} />
         </Routes>
       </div>

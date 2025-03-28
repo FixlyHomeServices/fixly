@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const ServiceOffering = require("../models/serviceoffering");
-const { verifyToken } = require("../middlewares/authmiddleware");// Ensure only logged-in users can access
+const AddService = require("../models/services"); // Updated model import
+const { verifyToken } = require("../middlewares/authmiddleware"); // Fixed path syntax
 
-// Add a new service offering
+// Add a new service 
 router.post("/add", verifyToken, async (req, res) => {
   try {
     const { loc, name, type, reminder } = req.body;
@@ -12,7 +12,7 @@ router.post("/add", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "All required fields must be provided" });
     }
 
-    const newService = new ServiceOffering({
+    const newService = new AddService({
       user: req.user.id, // Extracted from the token
       loc,
       name,
@@ -21,7 +21,7 @@ router.post("/add", verifyToken, async (req, res) => {
     });
 
     await newService.save();
-    res.status(201).json({ message: "Service offering added successfully", service: newService });
+    res.status(201).json({ message: "Service added successfully", service: newService });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -31,7 +31,7 @@ router.post("/add", verifyToken, async (req, res) => {
 // Get all services for a user
 router.get("/my-services", verifyToken, async (req, res) => {
   try {
-    const services = await ServiceOffering.find({ user: req.user.id });
+    const services = await AddService.find({ user: req.user.id });
     res.status(200).json(services);
   } catch (error) {
     console.error(error);

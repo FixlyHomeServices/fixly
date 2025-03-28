@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ServiceOfferingSchema = new mongoose.Schema({
+const ServicesSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", 
@@ -14,12 +14,12 @@ const ServiceOfferingSchema = new mongoose.Schema({
     type: String, 
     required: true,
   },
-  rating: {
-    type: Number, 
-    default: 0,
-    min: 0,
-    max: 5,
-  },
+  // rating: {
+  //   type: Number, 
+  //   default: 0,
+  //   min: 0,
+  //   max: 5,
+  // },
   type: {
     type: String, 
     required: true,
@@ -30,4 +30,4 @@ const ServiceOfferingSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-module.exports = mongoose.model("ServiceOffering", ServiceOfferingSchema);
+module.exports = mongoose.model("service", ServicesSchema);
