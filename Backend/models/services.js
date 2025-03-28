@@ -24,6 +24,10 @@ const ServicesSchema = new mongoose.Schema({
     type: String, 
     required: true,
   },
+  priceRange: {
+    type: String, 
+    required: true,
+  },
   reminder: {
     type: Boolean, 
     default: false,

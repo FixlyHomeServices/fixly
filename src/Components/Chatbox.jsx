@@ -31,7 +31,7 @@ const Chatbot = () => {
 
 
     try {
-      const response = await axios.post("http://localhost:3001/backend/chat", { 
+      const response = await axios.post("http://localhost:5000/backend/chat", { 
         message,
         email: userEmail,
       });
