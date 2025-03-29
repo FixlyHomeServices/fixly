@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 export default function LogIn() {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // 🔹 Fix: Added missing dispatch declaration
+  const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
 
   const [formData, setFormData] = useState({ email: "", otp: "" });
@@ -22,6 +22,10 @@ export default function LogIn() {
       setOtpSent(true);
       setFormData((prev) => ({ ...prev, email: location.state.email }));
     }
+
+    // Test localStorage
+    localStorage.setItem("testKey", "testValue");
+    console.log("Test Key from localStorage:", localStorage.getItem("testKey"));
   }, [location]);
 
   const handleChange = (e) => {
@@ -45,9 +49,7 @@ export default function LogIn() {
       setOtpSent(true);
     } catch (error) {
       console.error("OTP sending error:", error);
-      alert(
-        error.response?.data?.message || "Something went wrong! Try again."
-      );
+      alert(error.response?.data?.message || "Something went wrong! Try again.");
     } finally {
       setLoading(false);
     }
@@ -66,17 +68,20 @@ export default function LogIn() {
     try {
       const response = await axios.post(
         "http://localhost:3001/auth/login",
-        {
-          email: formData.email,
-          otp: formData.otp, // Include OTP in request
-        },
-        { withCredentials: true } // 🔹 Fix: Ensure cookies are handled properly
+        { email: formData.email, otp: formData.otp },
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
-        dispatch(setAuthUser(response.data.user)); // 🔹 Fix: Correct variable name
+        const userData = response.data.user;
+        dispatch(setAuthUser(userData));
+
+        // ✅ Store user email in localStorage
+        localStorage.setItem("user", JSON.stringify({ email: userData.email }));
+        console.log("User email stored in localStorage:", userData.email);
+
         alert("Login successful!");
-        navigate("/"); // Redirect to profile page
+        navigate("/");
       }
     } catch (error) {
       console.error("OTP verification error:", error);
@@ -98,10 +103,7 @@ export default function LogIn() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-300"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
               Email or Mobile Number
             </label>
             <input
@@ -128,10 +130,7 @@ export default function LogIn() {
           ) : (
             <>
               <div>
-                <label
-                  htmlFor="otp"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="otp" className="block text-sm font-medium text-gray-300">
                   Enter OTP
                 </label>
                 <input
@@ -158,10 +157,7 @@ export default function LogIn() {
 
         <p className="mt-10 text-center text-sm text-gray-400">
           Not a member?{" "}
-          <Link
-            to="/login/register"
-            className="font-semibold text-indigo-400 hover:text-indigo-300"
-          >
+          <Link to="/login/register" className="font-semibold text-indigo-400 hover:text-indigo-300">
             Register here
           </Link>
         </p>
