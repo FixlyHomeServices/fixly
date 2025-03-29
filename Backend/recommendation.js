@@ -1,10 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
-import Request from '../models/request.js'; // Import the Request model
-import Service from '../models/services.js'; // Import the Service model
-import ServiceCategory from '../models/serviceCategory.js'; // Import ServiceCategory model
-import User from '../models/user.js'; // Import User model
+import Request from './models/request.js'; // Import the Request model
+import Service from './models/services.js'; // Import the Service model
+import ServiceCategory from './models/serviceCatageroy.js'; // Import ServiceCategory model
+import User from './models/users.js'; // Import User model
 
 dotenv.config();
 const router = express.Router();
