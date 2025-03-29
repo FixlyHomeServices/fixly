@@ -1,48 +1,47 @@
-const axios = require("axios");
-const { ServiceCategory } = require("./models/serviceCatageroy"); // Import ServiceCategory model
+const ServiceCategory = require("./models/serviceCatageroy");
 
-// Function to extract JSON from OpenAI response
-function extractJSON(text) {
-  const match = text.match(/\[.*\]/s);
-  try {
-    return match ? JSON.parse(match[0]) : [];
-  } catch (error) {
-    console.error("Error parsing JSON from AI response:", error.message);
-    return [];
-  }
+function extractServiceName(query) {
+    // Remove location words like "in Kanpur", "near Delhi", etc.
+    return query.replace(/\bin\s+[A-Z][a-z]+/g, "").trim();
 }
 
-// Function to filter services using OpenAI and MongoDB query (accepts `app` parameter)
-function filterServicesWithAI(app) {
-  app.post("/services/filter", async (req, res) => {
-    const { query } = req.body;
-    if (!query) return res.status(400).json({ error: "Query is required" });
-
+async function filterServicesWithAI(query) {
     try {
-      console.log("Original user query:", query);
+        console.log("Original user query:", query);
 
-      // Example OpenAI API logic: you can adjust the following part if needed
-      const aiFormattedQuery = query; // No OpenAI call here; add if needed
-      console.log("AI-formatted query:", aiFormattedQuery);
+        // Extract service name (removes location info)
+        const cleanQuery = extractServiceName(query);
+        console.log("Filtered query (without location):", cleanQuery);
 
-      // Fetch services from MongoDB using regex-based search for flexibility
-      const services = await ServiceCategory.find({
-        $or: [
-          { "services.title": { $regex: aiFormattedQuery, $options: "i" } },
-          { "featuredServices.title": { $regex: aiFormattedQuery, $options: "i" } },
-          { "homeServices.title": { $regex: aiFormattedQuery, $options: "i" } },
-        ],
-      });
+        // Fetch the service category that contains a matching service title
+        const serviceCategory = await ServiceCategory.findOne({ "services.title": { $regex: cleanQuery, $options: "i" } })
+            .populate({
+                path: "services.agents",
+                select: "fullName", // Fetch only full names of service providers
+            });
 
-      console.log("Services returned from MongoDB:", services);
+        if (!serviceCategory) {
+            console.log("No matching services found.");
+            return [];
+        }
 
-      // Send the filtered results, or "No results found" if empty
-      res.json(services.length ? services : [{ name: "No results found", rating: "N/A" }]);
+        // Extract the services that match the cleaned query
+        const matchedServices = serviceCategory.services.filter(service =>
+            service.title.toLowerCase().includes(cleanQuery.toLowerCase())
+        );
+
+        // Format the response to include provider names
+        const response = matchedServices.map(service => ({
+            serviceName: service.title,
+            providerNames: service.agents.map(agent => agent.fullName), // Extract service provider names
+        }));
+
+        console.log("Filtered Services:", response);
+        return response;
     } catch (error) {
-      console.error("Error fetching services with AI:", error);
-      res.status(500).json({ error: "Error processing request" });
+        console.error("Error fetching services:", error);
+        return [];
     }
-  });
 }
 
 module.exports = filterServicesWithAI;

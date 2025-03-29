@@ -16,30 +16,34 @@ const Chatbot = () => {
   const [showChat, setShowChat] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
 
+  // Retrieve user email from localStorage
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUserEmail(parsedUser.email);
-      console.log("User email retrieved from localStorage:", parsedUser.email); // Debugging line
+      console.log("User email retrieved:", parsedUser.email);
+    } else {
+      console.log("No user data found in localStorage");
     }
   }, []);
-  
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
-  
-    console.log("Sending message:", message);
-    console.log("Sending userEmail:", userEmail); // Debug this
-  
-    setMessages((prev) => [...prev, { text: message, sender: "user" }]);
-  
-    try {
-      const response = await axios.post("http://localhost:3001/chat", { message, email: userEmail });
-      
-      
-  
 
+    console.log("Sending message:", message);
+    console.log("Sending userEmail:", userEmail || "No email found"); 
+
+    setMessages((prev) => [...prev, { text: message, sender: "user" }]);
+
+    // Ensure email is set before sending the request
+    const emailToSend = userEmail || JSON.parse(localStorage.getItem("user"))?.email;
+
+    try {
+      const response = await axios.post("http://localhost:3001/chat", { 
+        message, 
+        email: emailToSend 
+      });
 
       setMessages((prev) => [
         ...prev,
@@ -132,4 +136,3 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
-
