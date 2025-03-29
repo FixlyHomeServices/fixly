@@ -1,38 +1,53 @@
-import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LogIn from './Components/LogIn';
-import Home from './Components/Home';
-import Services from './Components/Services';
-import MoreDetails from './Components/MoreDetails';
-import Register from './Components/Register';
-import UserProtectWrapper from './Components/UserProtectWrapper';
-import Profile from './Components/profile';
-import Logout from './Components/Logout';
+import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LogIn from "./Components/LogIn";
+import Home from "./Components/Home";
+import Services from "./Components/Services";
+import MoreDetails from "./Components/MoreDetails";
+import Register from "./Components/Register";
+import AddService from "./Components/addServices";
+import CartPage from "./Components/cart";
+import Dashboard from "./Components/Dashboard";
+import Profile from "./Components/profile";
+import ProctedRoutes from "./context/ProctedRoutes";
 
 const App = () => {
   return (
-      <div>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/profile' element={
-            <UserProtectWrapper>
-              <Home />
-            </UserProtectWrapper>
-          } />
-          <Route path='/profileUI' element={<UserProtectWrapper><Profile /></UserProtectWrapper>} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/moredetails/:serviceId" element={<MoreDetails />} />
-          <Route path='/login' element={<LogIn />} />
-          <Route path='/login/register' element={<Register />} />
-          <Route path='/home'
-          element={<UserProtectWrapper><Home /></UserProtectWrapper>  } />
-          <Route path='/logout' element={
-          <UserProtectWrapper>
-            <Logout />
-          </UserProtectWrapper>}></Route>
-          <Route path='/*' element={<h1>404 Error</h1>} />
-        </Routes>
-      </div>
+    <div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/profile"
+          element={
+            <ProctedRoutes>
+              <Profile />
+            </ProctedRoutes>
+          }
+        />
+        <Route path="/services" element={<Services />} />
+        <Route
+          path="/addservices"
+          element={
+            <ProctedRoutes>
+              <AddService />
+            </ProctedRoutes>
+          }
+        />
+        <Route path="/moredetails/:serviceId" element={<MoreDetails />} />
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/login/register" element={<Register />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProctedRoutes>
+              <Dashboard />
+            </ProctedRoutes>
+          }
+        />
+        <Route path="/*" element={<h1>404 Error</h1>} />
+      </Routes>
+    </div>
   );
 };
 

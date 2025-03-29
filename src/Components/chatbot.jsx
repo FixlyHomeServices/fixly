@@ -21,20 +21,24 @@ const Chatbot = () => {
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUserEmail(parsedUser.email);
+      console.log("User email retrieved from localStorage:", parsedUser.email); // Debugging line
     }
   }, []);
+  
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
-
+  
+    console.log("Sending message:", message);
+    console.log("Sending userEmail:", userEmail); // Debug this
+  
     setMessages((prev) => [...prev, { text: message, sender: "user" }]);
-
-
+  
     try {
-      const response = await axios.post("http://localhost:5000/backend/chat", { 
-        message,
-        email: userEmail,
-      });
+      const response = await axios.post("http://localhost:3001/chat", { message, email: userEmail });
+      
+      
+  
 
 
       setMessages((prev) => [
@@ -128,3 +132,4 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
+

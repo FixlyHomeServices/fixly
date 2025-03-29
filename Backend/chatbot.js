@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const ServiceRequest = require("./models/request");
+const Request = require("./models/request"); // Request model import
+const User = require("./models/users"); // User model import
 
+// Predefined knowledge base
 const knowledgeBase = {
   "select a service":
     "Fixly offers plumbing, electrical, cleaning, and home repair services. Which one do you need?",
@@ -10,8 +12,7 @@ const knowledgeBase = {
     "Fixly provides full refunds for cancellations within 24 hours. Partial refunds may apply after that.",
   "how to book a service":
     "Search for a service, choose a provider, and confirm your booking online.",
-  "contact support":
-    "You can contact Fixly support via the website's Contact page.",
+  "contact support": "You can contact Fixly support via the website's Contact page.",
   "what is fixly":
     "Fixly connects you with trusted home service providers for repairs and maintenance.",
   "how does fixly work":
@@ -20,6 +21,7 @@ const knowledgeBase = {
     "Yes, all Fixly service providers go through a verification process.",
 };
 
+// Main chatbot options
 const mainOptions = [
   "Select a service",
   "Ask about refund policy",
@@ -28,8 +30,10 @@ const mainOptions = [
   "Ask about previous orders",
 ];
 
+// Function to generate AI response using OpenAI API
 async function getAIResponse(query) {
   const openaiApiKey = process.env.OPENAI_API_KEY;
+  console.log("Loaded OpenAI API Key:", process.env.OPENAI_API_KEY);
 
   try {
     const response = await axios.post(
@@ -50,79 +54,92 @@ async function getAIResponse(query) {
       }
     );
 
+    console.log("OpenAI API Response:", response.data); // 🔍 Log the API response
+
     return response.data.choices[0].message.content.trim();
   } catch (error) {
-    console.error("Error getting AI response:", error.message);
+    console.error("Error getting AI response:", error.message); // Keep this for error logs
     return "I couldn't process that right now. Try again later.";
   }
 }
 
-router.post("/chat", async (req, res) => {
-    const userMessage = req.body.message.toLowerCase();
-    const userEmail = req.body.email; // Passed from frontend
-    let response = "";
-    let options = mainOptions;
-  
+
+// Chatbot route
+router.post("/", async (req, res) => {
+
+  const userMessage = req.body.message.toLowerCase();
+  const userEmail = req.body.email; // Passed from frontend
+  let response = "";
+  let options = mainOptions;
 
   if (userMessage.includes("ask something else")) {
     response = "Sure! What would you like to know?";
-    options = mainOptions;
-  } else if (
-    userMessage.includes("no, i'm done") ||
-    userMessage.includes("no i'm done")
-  ) {
+  } else if (userMessage.includes("no, i'm done") || userMessage.includes("no i'm done")) {
     return res.json({
       response: "Alright! Let me know if you need help anytime. 😊",
       options: [],
     });
-  } 
-  // ✅ Handle previous orders — only if email is provided
+  }
+  // ✅ Fetching "Pending" and Other Orders
   else if (userMessage.includes("previous order")) {
     if (!userEmail) {
       response = "Please log in to view your previous orders.";
       options = ["Ask something else", "No, I'm done"];
     } else {
       try {
-        const orders = await ServiceRequest.find({ customerEmail: userEmail })
-          .sort({ createdAt: -1 })
-          .limit(3);
-
-        if (orders.length > 0) {
-          response =
-            "Here are your recent services:\n" +
-            orders
-              .map(
-                (order) =>
-                  `Service: ${order.serviceCategory || order.service}, Date: ${order.createdAt.toDateString()}, Status: ${order.status || "N/A"}`
-              )
-              .join("\n");
+        // Fetch user by email and orders tied to that user
+        const user = await User.findOne({ email: userEmail });
+        if (!user) {
+          response = "No user found with this email. Please check your login.";
         } else {
-          response = "You don't have any previous orders yet.";
-        }
-        options = ["Ask something else", "No, I'm done"];
-      } catch (err) {
-        response = "I couldn't fetch your orders right now. Please try again later.";
-        options = ["Ask something else", "No, I'm done"];
-      }
-    }
-  } 
-  // Check knowledge base
-  else {
-    for (const key in knowledgeBase) {
-      if (userMessage.includes(key)) {
-        response = knowledgeBase[key];
-        options = ["Ask something else", "No, I'm done"];
-        break;
-      }
-    }
+          const orders = await Request.find({ requestingUser: user._id })
+            .populate({
+              path: "service",
+              select: "name user",
+              populate: { path: "user", select: "name" },
+            })
+            .sort({ createdAt: -1 })
+            .limit(5);
 
-    // Fallback to GPT
-    if (!response) {
-      response = await getAIResponse(userMessage);
+          console.log("Fetched Orders with Populated Data:", JSON.stringify(orders, null, 2));
+
+          if (orders.length > 0) {
+            response =
+              "Here are your recent service requests:\n" +
+              orders
+                .map(
+                  (order) =>
+                    `Service: ${
+                      order.service?.name || order.service?.user?.name || "N/A"
+                    }, Date: ${new Date(order.createdAt).toDateString()}, Status: ${order.status}`
+                )
+                .join("\n");
+          } else {
+            response = "You don't have any previous orders yet.";
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        response = "I couldn't fetch your orders right now. Please try again later.";
+      }
       options = ["Ask something else", "No, I'm done"];
     }
   }
+  // Check knowledge base if no response so far
+  if (!response) {
+    const knowledgeResponse = Object.keys(knowledgeBase).find((key) =>
+      userMessage.includes(key)
+    );
+    if (knowledgeResponse) {
+      response = knowledgeBase[knowledgeResponse];
+    } else {
+      // Fallback to GPT response if no match in knowledge base
+      response = await getAIResponse(userMessage);
+    }
+    options = ["Ask something else", "No, I'm done"];
+  }
 
+  // Send the chatbot response
   res.json({ response, options });
 });
 

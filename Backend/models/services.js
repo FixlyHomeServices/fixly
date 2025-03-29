@@ -1,37 +1,34 @@
 const mongoose = require("mongoose");
 
-const ServicesSchema = new mongoose.Schema({
+const ServiceSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", 
+    ref: "User",
     required: true,
   },
-  loc: {
-    type: String,
+  serviceCategory: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
-  name: {
-    type: String, 
-    required: true,
+  loc: { type: String, required: true },
+  reminder: { type: Boolean, default: false },
+  time: {
+    start: {
+      type: String,
+      required: true,
+      match: /^([01]\d|2[0-3]):([0-5]\d)$/,
+    },
+    end: {
+      type: String,
+      required: true,
+      match: /^([01]\d|2[0-3]):([0-5]\d)$/,
+    },
   },
-  // rating: {
-  //   type: Number, 
-  //   default: 0,
-  //   min: 0,
-  //   max: 5,
-  // },
-  type: {
-    type: String, 
-    required: true,
-  },
-  priceRange: {
-    type: String, 
-    required: true,
-  },
-  reminder: {
-    type: Boolean, 
-    default: false,
-  },
+
 }, { timestamps: true });
 
-module.exports = mongoose.model("service", ServicesSchema);
+// Prevent model re-compilation error
+const ServiceRequest = mongoose.models.Services || mongoose.model("Services", ServiceSchema)
+// const ServiceRequest = mongoose.models.Service || mongoose.model("Service", ServiceSchema);
+
+module.exports = ServiceRequest;

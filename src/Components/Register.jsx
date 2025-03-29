@@ -1,52 +1,50 @@
-import logo from '../assets/logo.png';
-import { Link, useNavigate } from 'react-router-dom';
-import axios, { HttpStatusCode } from 'axios';
-import { useState, useContext } from 'react';
-import { UserDataContext } from '../context/usercontext';
-//username, fullName, email, mobile, roles
+import logo from "../assets/logo.png";
+import { Link, useNavigate } from "react-router-dom";
+import axios, { HttpStatusCode } from "axios";
+import { useState } from "react";
 
 export default function Register() {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [roles, setRoles] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [roles, setRoles] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  const { user, setUser } = useContext(UserDataContext);
-
   const submitHandler = async (e) => {
     e.preventDefault();
-    try{
-    const newUser = {
-      username: username,
-      fullName: fullName,
-      email: email,
-      mobile: mobile,
-      roles : roles 
-    };
+    try {
+      const newUser = {
+        username: username,
+        fullName: fullName,
+        email: email,
+        mobile: mobile,
+        roles: roles,
+      };
 
-    console.log('Submitting new user:', newUser);
-    const response = await axios.post(`http://localhost:3001/auth/signup`, newUser);
+      console.log("Submitting new user:", newUser);
+      const response = await axios.post(
+        `http://localhost:3001/auth/signup`,
+        newUser
+      );
 
-    if (response.status === HttpStatusCode.Ok) {
-      const data = response.data;
-      setUser(data.user);
-      localStorage.setItem('token', data.token);
-      navigate('/login');
-    }
-  }
-    catch (err) {
+      if (response.status === HttpStatusCode.Ok) {
+        const data = response.data;
+        setUser(data.user);
+        localStorage.setItem("token", data.token);
+        navigate("/login");
+      }
+    } catch (err) {
       setError(err.response?.data?.message || "Signup failed. Try again.");
     }
 
-        setEmail('');
-        setUsername('');
-        setFullName('');
-        setMobile('');
-        setRoles('');
+    setEmail("");
+    setUsername("");
+    setFullName("");
+    setMobile("");
+    setRoles("");
   };
 
   return (
@@ -63,7 +61,10 @@ export default function Register() {
           <form onSubmit={submitHandler} className="space-y-6">
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="full-name" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="full-name"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Full Name
                 </label>
               </div>
@@ -81,10 +82,13 @@ export default function Register() {
                 />
               </div>
             </div>
-            
+
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="username" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Username
                 </label>
               </div>
@@ -104,7 +108,10 @@ export default function Register() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Email address
                 </label>
               </div>
@@ -123,31 +130,36 @@ export default function Register() {
             </div>
 
             <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="mobile" className="block text-sm font-medium text-gray-300">
-                Mobile Number
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="mobile"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Mobile Number
+                </label>
+              </div>
+              <div className="mt-2">
+                <input
+                  id="mobile"
+                  name="mobile"
+                  type="tel"
+                  pattern="[0-9]{10}"
+                  title="Please enter a 10-digit mobile number"
+                  required
+                  autoComplete="tel"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
             </div>
-            <div className="mt-2">
-              <input
-                id="mobile"
-                name="mobile"
-                type="tel" 
-                 pattern="[0-9]{10}"  
-                title="Please enter a 10-digit mobile number" 
-                required
-                autoComplete="tel"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </div>
-          </div>
-
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="roles" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="roles"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Role
                 </label>
               </div>
@@ -159,7 +171,7 @@ export default function Register() {
                   required
                   autoComplete="off"
                   onChange={(e) => setRoles(e.target.value)}
-                  placeholder='customer or vendor'
+                  placeholder="customer or serviceProvider"
                   className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
@@ -176,8 +188,11 @@ export default function Register() {
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-400">
-            Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-indigo-500 hover:text-indigo-400">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-indigo-500 hover:text-indigo-400"
+            >
               Sign in here
             </Link>
           </p>
