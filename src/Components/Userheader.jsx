@@ -1,6 +1,4 @@
-'use client'
-
-import {useContext, useState } from 'react';
+import { useContext, useState } from "react";
 
 import {
   Dialog,
@@ -12,7 +10,7 @@ import {
   PopoverButton,
   PopoverGroup,
   PopoverPanel,
-} from '@headlessui/react';
+} from "@headlessui/react";
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -21,45 +19,70 @@ import {
   FingerPrintIcon,
   SquaresPlusIcon,
   XMarkIcon,
-} from '@heroicons/react/24/outline';
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid';
-import { Link } from 'react-router-dom';
-import { FaUserCircle } from 'react-icons/fa';
-import { UserDataContext } from '../context/usercontext';
-import logo from '../assets/logo.png';
+} from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  PhoneIcon,
+  PlayCircleIcon,
+} from "@heroicons/react/20/solid";
+import { Link } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+// import { UserDataContext } from "../context/usercontext";
+import logo from "../assets/logo.png";
 
 const products = [
-  { name: 'AC repair technician', description: 'Services and repairs air conditioning units', href: '#', icon: ChartPieIcon },
-  { name: 'TV Mounting Specialist', description: 'Mounts televisions on walls ', href: '#', icon: CursorArrowRaysIcon },
-  { name: 'Electrician', description: ' Installs, repairs, and maintains electrical wiring, switches, outlets, and fixtures', href: '#', icon: FingerPrintIcon },
-  { name: 'Window cleaner', description: 'Clean windows thoroughly and safely in all locations', href: '#', icon: SquaresPlusIcon },
-  { name: 'Gardener', description: 'planting new plants and trimming existing ones', href: '#', icon: ArrowPathIcon },
+  {
+    name: "AC repair technician",
+    description: "Services and repairs air conditioning units",
+    href: "#",
+    icon: ChartPieIcon,
+  },
+  {
+    name: "TV Mounting Specialist",
+    description: "Mounts televisions on walls ",
+    href: "#",
+    icon: CursorArrowRaysIcon,
+  },
+  {
+    name: "Electrician",
+    description:
+      " Installs, repairs, and maintains electrical wiring, switches, outlets, and fixtures",
+    href: "#",
+    icon: FingerPrintIcon,
+  },
+  {
+    name: "Window cleaner",
+    description: "Clean windows thoroughly and safely in all locations",
+    href: "#",
+    icon: SquaresPlusIcon,
+  },
+  {
+    name: "Gardener",
+    description: "planting new plants and trimming existing ones",
+    href: "#",
+    icon: ArrowPathIcon,
+  },
 ];
 const callsToAction = [
-  { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
-  { name: 'Contact sales', href: '#', icon: PhoneIcon },
+  { name: "Watch demo", href: "#", icon: PlayCircleIcon },
+  { name: "Contact sales", href: "#", icon: PhoneIcon },
 ];
 
 export default function UserHeader() {
-  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user } = useContext(UserDataContext);
+  //   const { user } = useContext(UserDataContext);
 
   return (
     <header className="bg-gray-900 w-full overflow:hidden">
-      <nav 
-        aria-label="Global" 
-        className="mx-auto flex max-w-7x3 items-center justify-between p-6 -mt-9" 
+      <nav
+        aria-label="Global"
+        className="mx-auto flex max-w-7x3 items-center justify-between p-6 -mt-9"
         style={{ marginTop: "0.2px" }}
       >
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
-            <img
-              alt="" 
-              src={logo}
-              className="h-16 w-auto" 
-            />
+            <img alt="" src={logo} className="h-16 w-auto" />
           </a>
         </div>
         <div className="flex lg:hidden">
@@ -76,7 +99,10 @@ export default function UserHeader() {
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
               Features
-              <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
+              <ChevronDownIcon
+                aria-hidden="true"
+                className="h-5 w-5 flex-none text-gray-400"
+              />
             </PopoverButton>
 
             <PopoverPanel
@@ -90,10 +116,16 @@ export default function UserHeader() {
                     className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-700"
                   >
                     <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-700 group-hover:bg-gray-600">
-                      <item.icon aria-hidden="true" className="h-6 w-6 text-gray-300 group-hover:text-indigo-400" />
+                      <item.icon
+                        aria-hidden="true"
+                        className="h-6 w-6 text-gray-300 group-hover:text-indigo-400"
+                      />
                     </div>
                     <div className="flex-auto">
-                      <a href={item.href} className="block font-semibold text-gray-300">
+                      <a
+                        href={item.href}
+                        className="block font-semibold text-gray-300"
+                      >
                         {item.name}
                         <span className="absolute inset-0" />
                       </a>
@@ -109,7 +141,10 @@ export default function UserHeader() {
                     href={item.href}
                     className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold text-gray-300 hover:bg-gray-600"
                   >
-                    <item.icon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
+                    <item.icon
+                      aria-hidden="true"
+                      className="h-5 w-5 flex-none text-gray-400"
+                    />
                     {item.name}
                   </a>
                 ))}
@@ -117,16 +152,22 @@ export default function UserHeader() {
             </PopoverPanel>
           </Popover>
 
-          <Link 
-             to="/home" 
-             className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
-            >
-             Home
-            </Link>
-          <a href="#" className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+          <Link
+            to="/home"
+            className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+          >
+            Home
+          </Link>
+          <a
+            href="#"
+            className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+          >
             About
           </a>
-          <a href="#" className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+          <a
+            href="#"
+            className="text-sm font-semibold text-gray-300 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+          >
             Add Services
           </a>
         </PopoverGroup>
@@ -137,13 +178,20 @@ export default function UserHeader() {
               <span>{user.fullName}</span>
             </Link>
           ) : (
-            <Link to="/login" className="text-sm font-semibold text-gray-300 hover:bg-green-600 transition duration-300 ease-in-out">
+            <Link
+              to="/login"
+              className="text-sm font-semibold text-gray-300 hover:bg-green-600 transition duration-300 ease-in-out"
+            >
               Log in <span aria-hidden="true">&rarr;</span>
             </Link>
           )}
         </div>
       </nav>
-      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
+      <Dialog
+        open={mobileMenuOpen}
+        onClose={setMobileMenuOpen}
+        className="lg:hidden"
+      >
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-700/10">
           <div className="flex items-center justify-between">
@@ -170,7 +218,10 @@ export default function UserHeader() {
                 <Disclosure as="div" className="-mx-3">
                   <DisclosureButton className="group flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 text-base font-semibold text-gray-300 hover:bg-gray-700">
                     Product
-                    <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none group-data-open:rotate-180" />
+                    <ChevronDownIcon
+                      aria-hidden="true"
+                      className="h-5 w-5 flex-none group-data-open:rotate-180"
+                    />
                   </DisclosureButton>
                   <DisclosurePanel className="mt-2 space-y-2">
                     {[...products, ...callsToAction].map((item) => (
@@ -207,11 +258,11 @@ export default function UserHeader() {
               <div className="py-6">
                 {user && user.fullName ? (
                   <div className="flex items-center text-white">
-                  <Link to="/profileUI">
-                    <FaUserCircle className="text-2xl mr-2 cursor-pointer" />
-                  </Link>
-                  <span>{user.fullName}</span>
-                </div>
+                    <Link to="/profileUI">
+                      <FaUserCircle className="text-2xl mr-2 cursor-pointer" />
+                    </Link>
+                    <span>{user.fullName}</span>
+                  </div>
                 ) : (
                   <Link
                     to="/login"

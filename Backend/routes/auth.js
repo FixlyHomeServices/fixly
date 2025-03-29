@@ -3,14 +3,14 @@ const router = express.Router();
 const User = require("../models/users");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const { verifyToken, logout } = require("../middlewares/authmiddleware");
+const dotenv = require("dotenv");
+const Service = require("../models/services");
+dotenv.config();
 
-require("dotenv").config();
-
-// OTP Generator
+// OTP Generator Function
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Setup Nodemailer
+// Setup Nodemailer (For Email OTPs)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -19,54 +19,60 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
-
-// Signup Route
+// ✅ 1. Signup Route
 router.post("/signup", async (req, res) => {
   try {
-    const { username, fullName, email, mobile, roles } = req.body;
+    const { fullName, username, email, mobile, roles } = req.body;
 
-    // Validate request
-    if (!fullName || (!email && !mobile) ) {
-      console.log("Validation failed:", { fullName, email, mobile, roles });
-      return res.status(400).json({ message: "All fields are required" });
+    if (!fullName || !username || (!email && !mobile)) {
+      return res.status(400).json({ message: "Full Name and Email/Mobile are required" });
     }
 
-    // Check if user exists
     let user = await User.findOne({ $or: [{ email }, { mobile }] });
 
-    if (!user) {
-      user = new User({ username, fullName, email, mobile, roles });
+    if (user) {
+      return res.status(400).json({ message: "User already exists. Please log in." });
     }
-    console.log(user);
 
-    // Generate OTP
     const otp = generateOTP();
-    user.otp = otp;
-    user.otpExpires = new Date(Date.now() + 5 * 60000); // OTP valid for 5 min
+    user = new User({
+      fullName,
+      username,
+      email,
+      mobile,
+      roles,
+      otp,
+      otpExpires: new Date(Date.now() + 5 * 60000),
+    });
+
     await user.save();
 
     // Send OTP via Email
     if (email) {
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your Fixly OTP",
-        text: `Your OTP is ${otp}`,
-      });
+      try {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Your Fixly Signup OTP",
+          text: `Your OTP is ${otp}`,
+        });
+        console.log("OTP sent successfully via email");
+      } catch (error) {
+        console.error("Error sending OTP email:", error);
+      }
     }
 
-    return res.status(200).json({ message: "OTP sent successfully!" });
+    return res.status(200).json({ message: "Signup successful. OTP sent!" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
+// ✅ 2. Request OTP for Login
 router.post("/request-otp", async (req, res) => {
   try {
     const { email, mobile } = req.body;
-    console.log(req.body);
 
     if (!email && !mobile) {
       return res.status(400).json({ message: "Email or Mobile is required" });
@@ -78,7 +84,6 @@ router.post("/request-otp", async (req, res) => {
       return res.status(404).json({ message: "User not found. Please sign up." });
     }
 
-    // Generate OTP
     const otp = generateOTP();
     user.otp = otp;
     user.otpExpires = new Date(Date.now() + 5 * 60000); // OTP valid for 5 minutes
@@ -86,12 +91,17 @@ router.post("/request-otp", async (req, res) => {
 
     // Send OTP via Email
     if (email) {
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your Fixly Login OTP",
-        text: `Your OTP is ${otp}`,
-      });
+      try {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Your Fixly Login OTP",
+          text: `Your OTP is ${otp}`,
+        });
+        console.log("OTP sent successfully via email");
+      } catch (error) {
+        console.error("Error sending OTP email:", error);
+      }
     }
 
     return res.status(200).json({ message: "OTP sent successfully!" });
@@ -101,52 +111,134 @@ router.post("/request-otp", async (req, res) => {
   }
 });
 
-// Login Route
+// ✅ 3. Verify OTP & Login
 router.post("/login", async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, mobile, otp } = req.body;
 
-    if (!otp || !email) {
-      console.log("Validation failed:", { email, otp });
+    if (!otp && (!email || !mobile)) {
       return res.status(400).json({ message: "OTP and contact info required" });
     }
 
-    // Find user
-    const user = await User.findOne({ $or: [{ email }] });
+    let user = await User.findOne({ $or: [{ email }, { mobile }] });
 
-    if (!user || user.otp !== otp || user.otpExpires < new Date()) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (new Date(user.otpExpires) < new Date()) {
+      return res.status(400).json({ message: "OTP expired" });
     }
 
     // Generate JWT Token
     const token = jwt.sign({ id: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     // Clear OTP after successful login
-    user.otp = null;
-    user.otpExpires = null;
-    await user.save();
+    await User.updateOne({ _id: user._id }, { $set: { otp: null, otpExpires: null } });
+    // user.otp = null;
+    // user.otpExpires = null;
+    // await user.save();
 
-    res.status(200).json({ message: "Login successful!", token });
+    res.status(200).cookie("token", token, { httpOnly: true }).json({ message: "Login successful!", user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 });
+router.get("/logout", async (req, res) => {
 
-// Profile Route
-router.get("/profile",verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-otp -otpExpires');
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
+    return res.status(200).cookie("token", "").json({
+      success: true,
+      message: 'Logged out successfully'
+    })
   } catch (error) {
-    console.error("Profile error:", error);
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({
+      status: false,
+      message: 'Something went wrong, please try again later'
+    })
+  }
+
+})
+
+router.post("/getagent", async (req, res) => {
+  try {
+    const { agentIds, serviceId } = req.body; // serviceId is now serviceCategory
+
+    if (!Array.isArray(agentIds) || agentIds.length === 0) {
+      return res.status(400).json({ error: "Invalid or empty agent IDs array" });
+    }
+
+    // Fetch agents' details (id, name)
+    const agents = await User.find(
+      { _id: { $in: agentIds } },
+      { fullName: 1, _id: 1 } // Fetch only fullName and _id
+    );
+
+    if (!agents.length) {
+      return res.status(404).json({ error: "No agents found" });
+    }
+
+    // Fetch services where serviceCategory matches and the agent is assigned
+    const services = await Service.find({
+      serviceCategory: serviceId,
+      user: { $in: agentIds }, // Each service belongs to an agent
+    });
+
+    if (!services.length) {
+      return res.status(404).json({ error: "No matching services found for these agents" });
+    }
+
+    // Function to generate 2-hour time slots
+    const generateTimeSlots = (start, end) => {
+      const slots = [];
+      let startHour = parseInt(start.split(":")[0]);
+      let endHour = parseInt(end.split(":")[0]);
+
+      for (let hour = startHour; hour < endHour; hour += 1) {
+        const nextHour = hour + 2;
+        if (nextHour <= endHour) {
+          slots.push(`${hour}:00 - ${nextHour}:00`);
+        }
+      }
+
+      return slots;
+    };
+
+    // Prepare agent details with their specific time slots
+    const agentDetails = agents.map((agent) => {
+      const assignedService = services.find((service) =>
+        service.user.equals(agent._id)
+      );
+
+      if (!assignedService) {
+        return {
+          id: agent._id,
+          name: agent.fullName,
+          availableTimeSlots: [],
+        };
+      }
+
+      const { start, end } = assignedService.time;
+
+      return {
+        id: agent._id,
+        name: agent.fullName,
+        startTime: start,
+        endTime: end,
+        availableTimeSlots: generateTimeSlots(start, end),
+      };
+    });
+
+    return res.json({ agents: agentDetails });
+  } catch (error) {
+    console.error("Error fetching agent details and time slots:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-router.post("/logout", verifyToken, logout);
 
 module.exports = router;

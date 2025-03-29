@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import axios from "axios";
+import { setAuthUser } from "../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function LogIn() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+  const dispatch = useDispatch(); // 🔹 Fix: Added missing dispatch declaration
+  const { user } = useSelector((store) => store.auth);
+
   const [formData, setFormData] = useState({ email: "", otp: "" });
   const [otpSent, setOtpSent] = useState(false);
   const [cameFromSignup, setCameFromSignup] = useState(false);
@@ -30,21 +35,19 @@ export default function LogIn() {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/auth/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        alert("OTP sent successfully!");
-        setOtpSent(true);
-      } else {
-        alert(data.message || "Failed to send OTP.");
-      }
+      const response = await axios.post(
+        "http://localhost:3001/auth/request-otp",
+        { email: formData.email },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      alert("OTP sent successfully!");
+      setOtpSent(true);
     } catch (error) {
       console.error("OTP sending error:", error);
-      alert("Something went wrong! Try again.");
+      alert(
+        error.response?.data?.message || "Something went wrong! Try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -52,28 +55,32 @@ export default function LogIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!otpSent) {
       alert("Please request an OTP first.");
       return;
     }
+
     setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
+      const response = await axios.post(
+        "http://localhost:3001/auth/login",
+        {
+          email: formData.email,
+          otp: formData.otp, // Include OTP in request
+        },
+        { withCredentials: true } // 🔹 Fix: Ensure cookies are handled properly
+      );
+
+      if (response.status === 200) {
+        dispatch(setAuthUser(response.data.user)); // 🔹 Fix: Correct variable name
         alert("Login successful!");
-        navigate("/profile"); // Redirect user after successful login
-      } else {
-        alert(data.message || "Invalid OTP.");
+        navigate("/"); // Redirect to profile page
       }
     } catch (error) {
       console.error("OTP verification error:", error);
-      alert("Something went wrong! Try again.");
+      alert(error.response?.data?.message || "Invalid OTP or server error.");
     } finally {
       setLoading(false);
     }
@@ -90,26 +97,24 @@ export default function LogIn() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                  Email or Mobile Number
-                </label>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  disabled={cameFromSignup}
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Email or Mobile Number
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              disabled={cameFromSignup}
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-md bg-gray-800 px-3 py-1.5 text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
 
           {!otpSent ? (
             <button
@@ -123,12 +128,12 @@ export default function LogIn() {
           ) : (
             <>
               <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="otp" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="otp"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Enter OTP
                 </label>
-              </div>
-              <div className="mt-2">
                 <input
                   id="otp"
                   name="otp"
@@ -136,11 +141,10 @@ export default function LogIn() {
                   required
                   value={formData.otp}
                   onChange={handleChange}
-                  className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-2 block w-full rounded-md bg-gray-800 px-3 py-1.5 text-white border border-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
-            </div>
-              
+
               <button
                 type="submit"
                 className="w-full rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500"
@@ -153,8 +157,11 @@ export default function LogIn() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-400">
-          Not a member?{' '}
-          <Link to="/login/register" className="font-semibold text-indigo-400 hover:text-indigo-300">
+          Not a member?{" "}
+          <Link
+            to="/login/register"
+            className="font-semibold text-indigo-400 hover:text-indigo-300"
+          >
             Register here
           </Link>
         </p>
