@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const Chatbot = () => {
@@ -15,6 +15,7 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const messagesEndRef = useRef(null);
 
   // Retrieve user email from localStorage
   useEffect(() => {
@@ -28,26 +29,33 @@ const Chatbot = () => {
     }
   }, []);
 
+  // Scroll to the latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const sendMessage = async (message) => {
     if (!message.trim()) return;
 
     console.log("Sending message:", message);
-    console.log("Sending userEmail:", userEmail || "No email found"); 
+    console.log("Sending userEmail:", userEmail || "No email found");
 
     setMessages((prev) => [...prev, { text: message, sender: "user" }]);
 
-    // Ensure email is set before sending the request
-    const emailToSend = userEmail || JSON.parse(localStorage.getItem("user"))?.email;
+    const emailToSend = userEmail || JSON.parse(localStorage.getItem("user"))?.email || "";
 
     try {
-      const response = await axios.post("http://localhost:3001/chat", { 
-        message, 
-        email: emailToSend 
+      const response = await axios.post("http://localhost:3001/chat", {
+        message,
+        email: emailToSend,
       });
+
+      // Modify response to show Service1, Service2 instead of N/A
+      const modifiedResponse = response.data.response.replace(/N\/A/g, (match, index) => `Service${index + 1}`);
 
       setMessages((prev) => [
         ...prev,
-        { text: response.data.response, sender: "bot" },
+        { text: modifiedResponse, sender: "bot" },
       ]);
       setOptions(response.data.options || []);
     } catch (error) {
@@ -93,12 +101,13 @@ const Chatbot = () => {
                 className={`p-2 rounded-lg w-fit max-w-[70%] ${
                   msg.sender === "bot"
                     ? "bg-gray-200 text-gray-800 self-start"
-                    : "bg-indigo-500 text-white self-end ml-auto"
+                    : "bg-indigo-500 text-white self-end"
                 }`}
               >
                 {msg.text}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="p-3 grid grid-cols-2 gap-2 border-t">

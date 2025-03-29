@@ -86,14 +86,35 @@ export default function HeaderSection() {
 
         {filteredShops.length > 0 && (
   <div className="mt-10 text-center text-white">
-    <h3 className="text-xl font-semibold">Results:</h3>
-    {filteredShops.map((shop, index) => (
-      <div key={index} className="mt-2">
-        {shop.serviceName} - Provided by: {shop.providerNames?.length > 0 ? shop.providerNames.join(", ") : "No providers available"}
-      </div>
-    ))}
+    <h3 className="text-2xl font-bold mb-6">Search Results</h3>
+    <div className="flex flex-wrap justify-center gap-6 px-6">
+      {filteredShops.map((shop, index) =>
+        shop.providerNames?.length > 0 ? (
+          shop.providerNames.map((provider, providerIndex) => (
+            <a 
+              key={`${index}-${providerIndex}`} 
+              href={`/moredetails/${shop._id}`} 
+              className="block bg-white w-64 rounded-lg shadow-lg p-4 transition transform hover:scale-105 hover:shadow-xl text-center"
+            >
+              <h4 className="text-lg font-semibold text-gray-800">{shop.serviceName}</h4>
+              <p className="text-sm text-gray-600 mt-2">Provided by: {provider}</p>
+            </a>
+          ))
+        ) : (
+          <div 
+            key={index} 
+            className="block bg-white w-64 rounded-lg shadow-lg p-4 text-center"
+          >
+            <h4 className="text-lg font-semibold text-gray-800">{shop.serviceName}</h4>
+            <p className="text-sm text-gray-600 mt-2">No providers available</p>
+          </div>
+        )
+      )}
+    </div>
   </div>
 )}
+
+ 
 
       </div>
     </div>
