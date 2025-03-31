@@ -45,7 +45,7 @@ const ServiceManagementDashboard = () => {
   ];
 
   // Determine the view based on user's first role
-  const isServiceProvider = user?.roles?.[0] === "serviceProvider";
+  const isServiceProvider = user?.roles?.includes("serviceProvider");
 
   // Function to find service title
   const findServiceTitle = (serviceId) => {
