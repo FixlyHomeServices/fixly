@@ -18,6 +18,7 @@ const addServicesRoutes = require("./routes/services");
 const dashboardRoutes = require("./routes/dashboard");
 const serviceCategoryRoutes = require("./routes/serviceCategory");
 const chatbotRoutes = require("./chatbot");
+const feedbackRoutes = require("./routes/feedback");
 
 const app = express();
 const PORT = 3001;
@@ -104,6 +105,8 @@ app.get("/api/recommendations", async (req, res) => {
   }
 });
 
+//feedback routes
+app.use('/feedback', feedbackRoutes);
 
 // 📌 Health check routes
 app.get("/", (req, res) => {

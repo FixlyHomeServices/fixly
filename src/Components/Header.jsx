@@ -5,9 +5,6 @@ import { useSelector } from "react-redux";
 import {
   Dialog,
   DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Popover,
   PopoverButton,
   PopoverGroup,
@@ -16,18 +13,18 @@ import {
 import {
   ArrowPathIcon,
   Bars3Icon,
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
+  TvIcon,
+  BoltIcon,
+  ScissorsIcon,
   ShoppingCartIcon,
   SquaresPlusIcon,
+  WrenchScrewdriverIcon,
   XMarkIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
-  PhoneIcon,
-  PlayCircleIcon,
+
 } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -37,19 +34,19 @@ const products = [
     name: "AC Repair",
     description: "Professional air conditioning services",
     href: "#",
-    icon: ChartPieIcon,
+    icon: WrenchScrewdriverIcon,
   },
   {
     name: "TV Mounting",
     description: "Expert wall-mounted TV installation",
     href: "#",
-    icon: CursorArrowRaysIcon,
+    icon: TvIcon,
   },
   {
     name: "Electrician",
     description: "Comprehensive electrical solutions",
     href: "#",
-    icon: FingerPrintIcon,
+    icon: BoltIcon,
   },
   {
     name: "Window Cleaning",
@@ -61,7 +58,7 @@ const products = [
     name: "Gardening",
     description: "Professional landscaping and plant care",
     href: "#",
-    icon: ArrowPathIcon,
+    icon: ScissorsIcon,
   },
 ];
 
@@ -128,13 +125,12 @@ export default function Header() {
                       <item.icon className="h-6 w-6 text-gray-600 group-hover:text-blue-600 transition" />
                     </div>
                     <div className="flex-auto">
-                      <Link
-                        to={item.href}
+                      <p
                         className="block font-semibold text-gray-900"
                       >
                         {item.name}
                         <span className="absolute inset-0" />
-                      </Link>
+                      </p>
                       <p className="mt-1 text-gray-500 text-sm">
                         {item.description}
                       </p>
@@ -146,16 +142,16 @@ export default function Header() {
           </Popover>
 
           <Link
-            to="/about"
-            className="text-sm font-semibold text-gray-300 hover:text-white transition"
-          >
-            About
-          </Link>
-          <Link
             to="/services"
             className="text-sm font-semibold text-gray-300 hover:text-white transition"
           >
             Services
+          </Link>
+          <Link
+            to="/feedback"
+            className="text-sm font-semibold text-gray-300 hover:text-white transition"
+          >
+            Feedback
           </Link>
         </PopoverGroup>
 

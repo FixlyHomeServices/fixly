@@ -10,6 +10,7 @@ import CartPage from "./Components/cart";
 import Dashboard from "./Components/Dashboard";
 import Profile from "./Components/profile";
 import ProctedRoutes from "./context/ProctedRoutes";
+import FeedbackPage from "./Components/FeedBack";
 
 const App = () => {
   return (
@@ -35,7 +36,7 @@ const App = () => {
         />
         <Route path="/moredetails/:serviceId" element={<MoreDetails />} />
         <Route path="/login" element={<LogIn />} />
-        <Route path="/cart" element={<CartPage />} />
+        <Route path="/cart" element={<ProctedRoutes><CartPage /></ProctedRoutes>} />
         <Route path="/login/register" element={<Register />} />
         <Route
           path="/dashboard"
@@ -45,6 +46,7 @@ const App = () => {
             </ProctedRoutes>
           }
         />
+        <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/*" element={<h1>404 Error</h1>} />
       </Routes>
     </div>

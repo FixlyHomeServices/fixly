@@ -114,7 +114,14 @@ export default function HeaderSection() {
   </div>
 )}
 
- 
+<div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-white">
+              <h3 className="text-2xl font-bold">{stat.value}</h3>
+              <p className="text-sm font-medium text-gray-300">{stat.name}</p>
+            </div>
+          ))}
+        </div>
 
       </div>
     </div>

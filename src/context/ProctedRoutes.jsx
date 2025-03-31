@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const ProctedRoutes = ({ children }) => {
-  const naqvigate = useNavigate();
+  const navigate = useNavigate();
   const { user } = useSelector((store) => store.auth);
   useEffect(() => {
     if (!user) {
-      naqvigate("/login");
+      navigate("/login");
     }
   }, []);
   return <>{children}</>;

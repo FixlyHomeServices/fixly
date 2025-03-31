@@ -1,83 +1,83 @@
 import React from "react";
-import pic from "../assets/logo.png";
+import dp1 from "../assets/profile1.png";
+import dp2 from "../assets/profile2.jpg";
+import dp3 from "../assets/profile3.jpg";
+import dp4 from "../assets/profile4.png";
+import dp5 from "../assets/profile5.jpg";
 
 const Hero = () => {
   const cards = [
     {
       id: 1,
       title: "Home Cleaning",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Get your home deep cleaned by professionals for a spotless space.",
       imgSrc:
         "https://www.dirtblastercleaningservices.com/wp-content/uploads/2021/05/Apartment-Cleaning-Services-Pune.jpg",
     },
     {
       id: 2,
       title: "AC Repair",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Expert AC repair and servicing to keep your cooling efficient.",
       imgSrc:
         "https://content.jdmagicbox.com/comp/def_content_category/ac-cleaning-services/360-f-288995585-4gmh9yorrie0zisc8dtqnl3d4dbhgeka-ac-cleaning-services-1-qs6s0.jpg",
     },
     {
       id: 3,
       title: "Electrician",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Reliable electrician services for repairs, wiring, and installation.",
       imgSrc:
         "https://esub.com/wp-content/uploads/2020/06/shutterstock_1469712527-e1593014532674.jpg",
     },
     {
       id: 4,
       title: "Plumber",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Quick plumbing solutions for leaks, installations, and repairs.",
       imgSrc:
         "https://www.serviceonwheel.com/uploads/service/834431670584630.jpg",
     },
     {
       id: 5,
       title: "Carpenter",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Skilled carpentry services for furniture, repairs, and fittings.",
       imgSrc:
         "https://3.imimg.com/data3/NE/TD/MY-10964064/carpentry-services-500x500.jpg",
     },
     {
       id: 6,
       title: "Gardener",
-      content:
-        "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.",
+      content: "Professional gardening services for lawn care and landscaping.",
       imgSrc:
         "https://www.local-gardeners.co.uk/wp-content/uploads/2018/10/shrub-maintenance-mistakes.jpg",
     },
   ];
+  
+  
 
   const teamMembers = [
     {
+      name: "Vishal Gupta",
+      role: "Mentor",
+      image: dp1,
+    },
+    {
+      name: "Dia Ahuja",
+      role: "Mentee",
+      image: dp2,
+    },
+    {
       name: "Divyanshi Sharma",
-      role: "Web Developer",
-      image: pic,
+      role: "Mentee",
+      image: dp3,
     },
     {
-      name: "Dries Vincent",
-      role: "Business Relations",
-      image: pic,
+      name: "Hemambika Reddy",
+      role: "Mentee",
+      image: dp4,
     },
     {
-      name: "Lindsay Walton",
-      role: "Front-end Developer",
-      image: pic,
-    },
-    {
-      name: "Courtney Henry",
-      role: "Designer",
-      image: pic,
-    },
-    {
-      name: "Alex Johnson",
-      role: "Marketing Specialist",
-      image: pic,
+      name: "Mishka Thakur",
+      role: "Mentee",
+      image: dp5,
     },
   ];
 
@@ -96,7 +96,7 @@ const Hero = () => {
         {cards.map((card) => (
           <a
             key={card.id}
-            href="#"
+            href="/services"
             className="flex flex-col bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <img
