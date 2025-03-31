@@ -98,7 +98,7 @@ router.get("/requests", verifyToken, async (req, res) => {
     }
     // const usersServices = await ServiceRequest.find({ agent: userId }).populate("requestingUser", "fullName email phoneNumber")
     // console.log(usersServices)
-    const requests = await ServiceRequest.find()
+    const requests = await ServiceRequest.find({agent: userId})
       .populate("requestingUser", "fullName email phoneNumber").populate("agent", "fullName email phoneNumber")
 
     res.status(200).json(requests)
