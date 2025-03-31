@@ -1,136 +1,57 @@
-// controllers/feedback.controller.js
-// In a real application, you would use a database like MongoDB
-// For now, we'll store feedback in memory
-const feedbackList = [];
+const Feedback = require("../models/feedbackmodel");  // Import Mongoose model
 
-/**
- * Create new feedback
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-exports.createFeedback = (req, res) => {
+// Create feedback
+exports.createFeedback = async (req, res) => {
   try {
     const { issueType, fullName, email, mobile, message } = req.body;
-    
-    // Validate required fields
+
     if (!issueType || !fullName || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide all required fields'
-      });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
-    
-    // Create feedback object
-    const newFeedback = {
-      id: Date.now().toString(),
-      issueType,
-      fullName,
-      email,
-      mobile: mobile || 'Not provided',
-      message,
-      createdAt: new Date()
-    };
-    
-    // Save to "database" (in-memory array)
-    console.log('New Feedback Created:', newFeedback);
-    feedbackList.push(newFeedback);
-    
-    // Success response
-    return res.status(201).json({
-      success: true,
-      message: 'Feedback submitted successfully',
-      data: newFeedback
-    });
+
+    const newFeedback = new Feedback({ issueType, fullName, email, mobile, message });
+    await newFeedback.save();  // Save to MongoDB
+
+    return res.status(201).json({ success: true, message: "Feedback submitted", data: newFeedback });
   } catch (error) {
-    console.error('Error creating feedback:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    console.error("Error creating feedback:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Get all feedback (for admin purposes)
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-exports.getAllFeedback = (req, res) => {
+// Get all feedback
+exports.getAllFeedback = async (req, res) => {
   try {
-    console.log('All Feedback:', feedbackList);
-    return res.status(200).json({
-      success: true,
-      count: feedbackList.length,
-      data: feedbackList
-    });
+    const feedbacks = await Feedback.find();  // Fetch from MongoDB
+    return res.status(200).json({ success: true, count: feedbacks.length, data: feedbacks });
   } catch (error) {
-    console.error('Error fetching feedback:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    console.error("Error fetching feedback:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Get feedback by ID
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-exports.getFeedbackById = (req, res) => {
+// Get feedback by ID
+exports.getFeedbackById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const feedback = feedbackList.find(item => item.id === id);
-    
-    if (!feedback) {
-      return res.status(404).json({
-        success: false,
-        message: 'Feedback not found'
-      });
-    }
-    
-    return res.status(200).json({
-      success: true,
-      data: feedback
-    });
+    const feedback = await Feedback.findById(req.params.id);
+    if (!feedback) return res.status(404).json({ success: false, message: "Feedback not found" });
+
+    return res.status(200).json({ success: true, data: feedback });
   } catch (error) {
-    console.error('Error fetching feedback:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    console.error("Error fetching feedback:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Delete feedback by ID
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-exports.deleteFeedback = (req, res) => {
+// Delete feedback
+exports.deleteFeedback = async (req, res) => {
   try {
-    const { id } = req.params;
-    const index = feedbackList.findIndex(item => item.id === id);
-    
-    if (index === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Feedback not found'
-      });
-    }
-    
-    // Remove from array
-    feedbackList.splice(index, 1);
-    
-    return res.status(200).json({
-      success: true,
-      message: 'Feedback deleted successfully'
-    });
+    const feedback = await Feedback.findByIdAndDelete(req.params.id);
+    if (!feedback) return res.status(404).json({ success: false, message: "Feedback not found" });
+
+    return res.status(200).json({ success: true, message: "Feedback deleted" });
   } catch (error) {
-    console.error('Error deleting feedback:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    console.error("Error deleting feedback:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
